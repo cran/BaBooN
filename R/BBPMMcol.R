@@ -8,6 +8,7 @@ BBPMM <- function(data,
                   vartype = NULL,
                   stepwise = TRUE,
                   maxit = 3,
+									maxPerc = 0.98,
                   verbose = TRUE,
                   setSeed = NULL,
                   ...)
@@ -17,7 +18,8 @@ BBPMM <- function(data,
 		n <- nrow(DAT) 
     l <- ncol(DAT)
     if (!is.null(ignore)) {
-      if(length(setdiff(ignore,varnames) > 0) | length(setdiff(ignore,1:l) > 0)) {
+      if((length(setdiff(ignore,varnames)) > 0 & is.character(ignore)) |
+				 (length(setdiff(ignore,1:l)) > 0 & is.numeric(ignore))) {
         stop("'ignore' is no subset of either number of columns or variable names!\n")
       }
       if (is.character(ignore)) {
@@ -26,6 +28,7 @@ BBPMM <- function(data,
       } else {
         ig.pos <- is.element(1:l, ignore)
       }
+			org.l <- ncol(DAT)
       not.inc <- as.data.frame(DAT[ ,ignore])
       varnames <- varnames[-ignore] 
       DAT <- DAT[ ,-ignore]
@@ -58,7 +61,6 @@ BBPMM <- function(data,
     nM <- "M"
     while (any(varnames == nM)) nM <- paste(nM,"M",sep="")
     onevar <- FALSE
-    org.l <- ncol(DAT)
     ## indicator matrix for missing values
     R <- matrix(is.na(DAT), nrow=n)
     mis.num <- colSums(is.na(DAT))
@@ -106,7 +108,7 @@ BBPMM <- function(data,
           if (verbose & !startSol & j == rev(p.impvar)[1]) cat("\n ")
           co2 <- co2 + 1
           if (startSol & length(p.comp) == 0) {
-            ## Hotdeck imputation for starting solution if no variable
+            ## hotdeck imputation for starting solution if no variable
             ## completely observed
             DAT[i.mis[[co2]],j] <- sample(DAT[i.obs[[co2]],j],
                                              length(i.mis[[co2]]),
@@ -115,22 +117,35 @@ BBPMM <- function(data,
           }
           y <- DAT[ ,j]
           if(startSol){
-            xvars <- paste(c(varnames[p.comp],varnames[p.impvar[0:(co2-1)]]),
+            noV <- which(apply(DAT[i.obs[[co2]],],2,var,na.rm=TRUE) == 0)
+            xvars <- paste(setdiff(c(varnames[p.comp],
+																		 varnames[p.impvar[0:(co2-1)]]),varnames[noV]),
                            collapse=' + ')
           } else {
-            xvars <- paste(varnames[-j], collapse = ' + ')
+            xvars <- paste(setdiff(varnames[-j],varnames[noV]), collapse = ' + ')
           }
           s.model <- as.formula(paste(varnames[j],'~',xvars))
+					## hotdeck imputation if y (almost) Dirac distributed
+          if (startSol) {usePos <- i.obs[[co2]]} else {usePos <- 1:n}
+					if (var(y[usePos],na.rm=TRUE) == 0 | max(table(y))/length(na.omit(usePos)) > maxPerc) {
+            DAT[i.mis[[co2]],j] <- sample(y[usePos], length(i.mis[[co2]]),TRUE)
+						next
+					}
           if (is.numeric(y)) {
             if (M == 1 | startSol) {
               regmod <- lm(s.model, data=DAT, subset = i.obs[[co2]])
             } else if (M > 1 & !startSol) {
+              while (var(y[ind1],na.rm=TRUE) == 0) {
+									ind1 <- BayesBoot(ind.obs = 1:n)
+							}
 							BB.data <- DAT[ind1, ]
               BB.stab <- BB.mod.stab.glm(data=DAT, BB.data=BB.data,
                                          s.model=s.model)
               regmod <- BB.stab$model}
-            if (stepwise) regmod <- stepAIC(regmod, trace=0, k=log(n),
-																						direction = "backward")
+            if (stepwise & summary(regmod)$r.squared < 1) {
+									try(regmod <- stepAIC(regmod, trace=0, k=log(n),
+																						direction = "backward"))
+						}
             y.pred <- predict(regmod, newdata=DAT)
             y.pred.mis <- y.pred[i.mis[[co2]]]
             y.pred.obs <- y.pred[i.obs[[co2]]]
@@ -152,8 +167,8 @@ BBPMM <- function(data,
                                           s.model=s.model)
               regmod <- BB.stab$model
             }
-            if (stepwise) regmod <- stepAIC(regmod, trace=0, k=log(n),
-																						direction = "backward")
+            if (stepwise) try(regmod <- stepAIC(regmod, trace=0, k=log(n),
+																						direction = "backward"))
             y.pred <- predict(regmod, newdata=DAT, type="probs")
             y.pred[y.pred > 0.999] <- 0.999
             y.pred[y.pred < 0.001] <- 0.001
@@ -180,8 +195,8 @@ BBPMM <- function(data,
                                          s.model=s.model, model="binomial")
               regmod <- BB.stab$model
             }
-            if (stepwise) regmod <- stepAIC(regmod, trace=0, k=log(n),
-																						direction = "backward")
+            if (stepwise) try(regmod <- stepAIC(regmod, trace=0, k=log(n),
+																						direction = "backward"))
             y.pred <- predict(regmod, newdata=DAT)
             y.pred.mis <- y.pred[i.mis[[co2]]]
             y.pred.obs <- y.pred[i.obs[[co2]]]

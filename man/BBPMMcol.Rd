@@ -11,7 +11,7 @@
 }
 
 \usage{BBPMM(data, M=10, nIter=10, outfile=NULL, ignore=NULL,
-vartype=NULL, stepwise=TRUE, maxit=3, verbose=TRUE, setSeed,...)}
+vartype=NULL, stepwise=TRUE, maxit=3, maxPerc = 0.98, verbose=TRUE, setSeed,...)}
 
 \arguments{
   \item{data}{A partially incomplete data frame or matrix.}
@@ -41,6 +41,10 @@ vartype=NULL, stepwise=TRUE, maxit=3, verbose=TRUE, setSeed,...)}
   \item{maxit}{Imported argument from the \code{nnet} package that
     specifies the maximum number of iterations for the multinomial logit
     model estimation. Default=3.}
+  \item{maxPerc}{The maximum percentage the mode category of a variable is allowed to have in order to 
+    try 'regular' imputation. If a variable is approximately Dirac distributed, i.e. if 
+    it has (almost) no variance, imputation is carried out by simple hot deck imputation. 
+    Default = 0.98.}
   \item{verbose}{The algorithm prints information on imputation and
     iteration numbers. Default=TRUE.}
   \item{setSeed}{Optional argument to fix the pseudo-random number generator in order to

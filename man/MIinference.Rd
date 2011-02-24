@@ -75,6 +75,7 @@ MI.y2 <- MI.inference(MI.m.meany2.hat, MI.v.meany2.hat,alpha=0.05)
 MI.y2$MI.Est
 MI.y2$MI.Var
 
+\dontrun{
 ################################################################
 ### example 2: a small simulation example
 
@@ -91,12 +92,12 @@ coverage <- function(value, bounds) {
 n <- 100
 ### true value for the mean of y2
 m.y2 <- 3.5
-y2.cover <- vector()
+y2.cover <- vector(length=n)
 set.seed(1000)
 
-### 40 data generations
+### 100 data generations
 time1 <- Sys.time()
-for (i in 1:40) {
+for (i in 1:100) {
   x1 <- round(runif(n,0.5,3.5))
   x2 <- round(runif(n,0.5,4.5))
   x3 <- runif(n,1,6)
@@ -126,5 +127,5 @@ difftime(time2, time1, unit="secs")
 ### coverage estimator (alpha=0.05):
 mean(y2.cover)
 
-
+}
 }

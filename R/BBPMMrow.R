@@ -73,9 +73,9 @@ BBPMM.row <- function(misDataPat,
     obs.pos[[j]] <- (1:n) [mrow == FALSE]
     ## Test for available degress of freedom in the model
     mc.test <- qr(as.matrix(data.set[obs.pos[[j]], comp.names]),...)
-    if((((length(obs.pos[[j]])-1) <= length(comp.names)) && stepwise == FALSE) ||
-       (mc.test$rank != length(comp.names))) {
-      stop("Block ",j, "has insufficient rank for imputation!\n")
+    if((((length(obs.pos[[j]])-1) <= length(comp.names)) & stepwise == FALSE) |
+       (mc.test$rank != length(comp.names) & stepwise == FALSE)) {
+      stop("Block ",j, " has insufficient rank for imputation!\n")
     }
   }
   xvars <- paste(comp.names,collapse= ' + ') 
