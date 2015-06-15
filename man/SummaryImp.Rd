@@ -2,7 +2,7 @@
 
 \alias{summary.imp}
 
-\title{Summary methd for objects of class \sQuote{imp}}
+\title{Summary method for objects of class \sQuote{imp}}
 
 \description{Returns some information about the incomplete data set and the imputation process.} 
 

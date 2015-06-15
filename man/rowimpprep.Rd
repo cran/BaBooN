@@ -17,7 +17,7 @@
     positions or names of the ID variable (if two data sets were stacked
     that have a joint subset of variables). The first element refers to
     the 'donor ID', the second element refers to the 'recipient
-    ID'. This disticntion is only of relevance, if the data set is 'L-shaped',
+    ID'. This distinction is only of relevance, if the data set is 'L-shaped',
     i.e. if the data contains only one missing-data pattern (where
     incomplete cases are 'recipients'). If \code{ID} has only one
     element, The function assumes that the identifier variables of the
@@ -36,6 +36,10 @@
     to object \code{blocks}.}
   \item{compNames}{A character vector containing the variable names
     of the (completely observed) imputation model variables.}
+  \item{ignore}{Contains positions of ignored variables.}
+  \item{ignored_data}{Contains ignored variables.}
+  \item{indMatrix}{A matrix with the same dimensions as the incomplete data 
+   containing flags for missing values.}
 }
 
 \details{\code{rowimpPrep} identifies
@@ -52,6 +56,7 @@
   aside) which are not to be used in the imputation model, have to be
   removed from the data set beforehand.}
 
+\author{Florian Meinfelder, Thorsten Schnapp [ctb]}
 
 \examples{
 

@@ -1,13 +1,21 @@
+# Bootstrap model stabilizer for multinomial logit models
+# Version:            0.2
+# Date:        2015-05-17
+# Author: F.M., ctb: T.S.
+# Note:   Needs nnet's multinom
+# Further infos, references and credits:
+#  See for nnet: Venables, W. N. & Ripley, B. D. (2002) Modern Applied Statistics with S. Fourth
+#                Edition. New York: Springer.
+# License: GPL-2 | GPL-3
 
-#######################################################################
-## Bootstrap model stabilizer for multinomial logit models
-
-BB.mod.stab.mlog <- function(data, BB.data, s.model,...)
+BB.mod.stab.mlog <- function(data, BB.data, s.model, maxit.multi=3,...)
   {   
     options(warn=-1)
-    regmod <- multinom(s.model,data=BB.data,trace=F,na.action=na.exclude)
+    regmod <- multinom(s.model,data=BB.data,trace=F,
+                       na.action=na.exclude, ...=list(maxit=maxit.multi))
     options(warn=0)
-    c.regmod <- multinom(s.model,data=data,trace=F,na.action=na.exclude)
+    c.regmod <- multinom(s.model,data=data,trace=F,
+                         na.action=na.exclude, ...=list(maxit=maxit.multi))
     
     misfactlevels <- !is.element(c.regmod$lev,regmod$lev)
     if (any(misfactlevels)==T) {

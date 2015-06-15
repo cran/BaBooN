@@ -41,12 +41,12 @@
 
 
 \references{
-  Rubin, D.B. (1987). \emph{Multiple Imputation for Non-Response
+  Rubin, D.B. (1987) \emph{Multiple Imputation for Non-Response
   in Surveys}. New York: John Wiley & Sons, Inc.
 }
 
 \examples{
-
+\dontrun{
 ### example 1
 n <- 100
 x1 <- round(runif(n,0.5,3.5))
@@ -60,22 +60,27 @@ y3 <- as.factor(ifelse(x2+rnorm(n,0,2)>2,1,0))
 mis1 <- sample(100,20)
 mis2 <- sample(100,30)
 mis3 <- sample(100,25)
-data1 <- data.frame("x1"=x1,"x2"=x2,"x3"=x3,"y1"=y1,"y2"=y2,"y3"=y3)
+data1 <- data.frame("x1"=x1,"x2"=x2,"x3"=x3,
+                    "y1"=y1,"y2"=y2,"y3"=y3)
 is.na(data1$y1[mis1]) <- TRUE
 is.na(data1$y2[mis2]) <- TRUE
 is.na(data1$y3[mis3]) <- TRUE
-imputed.data <- BBPMM(data1, M=10, nIter=10)
+imputed.data <- BBPMM(data1, M=5, nIter=5)
 
-MI.m.meany2.hat <- sapply(imputed.data$impdata,FUN=function(x) mean(x$y2))
-MI.v.meany2.hat <- sapply(imputed.data$impdata,FUN=function(x) var(x$y2)/length(x$y2))
+MI.m.meany2.hat <- sapply(imputed.data$impdata,
+                          FUN=function(x) mean(x$y2))
+                          
+MI.v.meany2.hat <- sapply(imputed.data$impdata,
+                          FUN=function(x) var(x$y2)/length(x$y2))
 
 ### MI inference
-MI.y2 <- MI.inference(MI.m.meany2.hat, MI.v.meany2.hat,alpha=0.05)
+MI.y2 <- MI.inference(MI.m.meany2.hat,
+                      MI.v.meany2.hat, alpha=0.05)
 
 MI.y2$MI.Est
 MI.y2$MI.Var
 
-\dontrun{
+
 ################################################################
 ### example 2: a small simulation example
 
@@ -109,16 +114,25 @@ for (i in 1:100) {
   mis1 <- sample(n,20)
   mis2 <- sample(n,30)
   mis3 <- sample(n,25)
-  data1 <- data.frame("x1"=x1,"x2"=x2,"x3"=x3,"y1"=y1,"y2"=y2,"y3"=y3)
+  data1 <- data.frame("x1"=x1,"x2"=x2,"x3"=x3,
+                      "y1"=y1,"y2"=y2,"y3"=y3)
   is.na(data1$y1[mis1]) <- TRUE
   is.na(data1$y2[mis2]) <- TRUE
   is.na(data1$y3[mis3]) <- TRUE
   
-  sim.imp <- BBPMM(data1, M=3, n.iter=2,stepwise=FALSE, verbose=FALSE)
-  MI.m.meany2.hat <- sapply(sim.imp$impdata,FUN=function(x) mean(x$y2))
-  MI.v.meany2.hat <- sapply(sim.imp$impdata,FUN=function(x) var(x$y2)/length(x$y2))
+  sim.imp <- BBPMM(data1, M=3, nIter=2,
+                   stepmod="", verbose=FALSE)
+
+  MI.m.meany2.hat <- sapply(sim.imp$impdata,
+                            FUN=function(x) mean(x$y2))
+
+  MI.v.meany2.hat <- sapply(sim.imp$impdata,
+                            FUN=function(x) 
+                            var(x$y2)/length(x$y2))
 ### MI inference
-  MI.y2 <- MI.inference(MI.m.meany2.hat, MI.v.meany2.hat,alpha=0.05)
+  MI.y2 <- MI.inference(MI.m.meany2.hat, MI.v.meany2.hat,
+                        alpha=0.05)
+
   y2.cover[i] <- coverage(m.y2, c(MI.y2$CI.low,MI.y2$CI.up))
 }
 time2 <- Sys.time()

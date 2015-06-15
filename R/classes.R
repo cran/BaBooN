@@ -1,7 +1,8 @@
+# summary class definitions
+# Version:       0.1-6
+# Date:     2011-02-24
+# Author:         F.M.
 
-
-#####################################################################################
-### plot and print class definitions
 
 summary.impprep <- function(object, nNames=10L,...) {
 	if (length(object$blocks) > 1) {

@@ -1,14 +1,22 @@
+# Bootstrap model stabilizer for linear models
+# Version:            0.2
+# Date:        2015-05-17
+# Author: F.M., ctb: T.S.
 
-#######################################################################
-## Bootstrap model stabilizer for linear models
-
-BB.mod.stab.glm <- function(data, BB.data, s.model, model="linear")
+BB.mod.stab.glm <- function(data, BB.data, s.model, model="linear", maxit.glm=25)
   {
     if (model == "binomial") {
+      
+      options(warn=-1) 
+	  
       regmod <- glm(s.model, data=BB.data, family = binomial(link="logit"),
-                    na.action=na.exclude)
-      c.regmod <- glm(s.model, data=data, family = binomial(link="logit"),
-                      na.action=na.exclude)
+                    na.action=na.exclude, control=glm.control(maxit = maxit.glm))
+					
+      options(warn=0) 
+	  
+	  c.regmod <- glm(s.model, data=data, family = binomial(link="logit"),
+                      na.action=na.exclude, control=glm.control(maxit = maxit.glm))
+					  
     } else if (model == "linear") {
       regmod <- lm(s.model, data=BB.data, na.action=na.exclude)
       c.regmod <- lm(s.model, data=data, na.action=na.exclude)

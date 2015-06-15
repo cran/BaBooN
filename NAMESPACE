@@ -1,7 +1,14 @@
-import("MASS","nnet")
+useDynLib(BaBooN)
+importFrom(nnet, multinom)
+importFrom(MASS, stepAIC)
+importFrom(Hmisc,asNumericMatrix)
+importFrom(Hmisc,matrix2dataFrame)
+importFrom(Rcpp,sourceCpp)
+importFrom(coda,mcmc)
+importFrom(coda,mcmc.list)
 export("rowimpPrep",
 "BBPMM.row",
 "BBPMM",
-"MI.inference")
+"MI.inference","dmi","impdiagnosticconversion")
 S3method("summary","imp")
 S3method("summary","impprep")

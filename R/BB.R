@@ -1,4 +1,7 @@
-
+# Bayesian Bootstrap
+# Version:       0.1-6
+# Date:     2011-02-24
+# Author:         F.M.
 
 BayesBoot <- function(ind.obs,...)
   {

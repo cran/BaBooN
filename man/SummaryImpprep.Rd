@@ -2,7 +2,7 @@
 
 \alias{summary.impprep}
 
-\title{Summary methd for objects of class \sQuote{impprep}}
+\title{Summary method for objects of class \sQuote{impprep}}
 
 \description{Returns an overview of missing-data patterns, in particular of missing-by-design patterns.} 
 
